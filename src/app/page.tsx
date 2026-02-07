@@ -57,7 +57,10 @@ export default function Home() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Hero Section */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="inline-block ubc-gradient rounded-xl px-6 py-2 mb-4">
+          <span className="text-white font-medium">For UBC Students, By UBC Students</span>
+        </div>
+        <h1 className="text-4xl font-bold text-ubc-blue mb-4 ubc-heading">
           UBC Student Marketplace
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -66,7 +69,7 @@ export default function Home() {
         
         {/* Impact Stats */}
         <div className="flex justify-center gap-8 mt-8">
-          <div className="flex items-center gap-2 text-green-600">
+          <div className="flex items-center gap-2 text-ubc-blue">
             <Leaf className="h-5 w-5" />
             <span className="font-semibold">247 items reused</span>
           </div>
@@ -82,7 +85,7 @@ export default function Home() {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+      <div className="ubc-gradient-subtle rounded-xl border border-gray-200 p-6 mb-8 shadow-sm">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />

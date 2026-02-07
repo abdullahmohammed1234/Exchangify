@@ -8,15 +8,15 @@ export default function Navbar() {
   const { data: session } = useSession();
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="ubc-header-gradient shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="ubc-gradient p-2 rounded-lg">
+              <div className="ubc-gradient p-2 rounded-lg shadow-sm">
                 <Leaf className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">DormLoop</span>
+              <span className="text-xl font-bold text-white ubc-heading">DormLoop</span>
             </Link>
           </div>
 
@@ -25,28 +25,31 @@ export default function Navbar() {
               <>
                 <Link
                   href="/listings/create"
-                  className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                  className="flex items-center space-x-2 bg-white text-ubc-blue px-4 py-2 rounded-lg hover:bg-ubc-grayLight transition-colors font-medium shadow-sm"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Sell Item</span>
                 </Link>
                 <Link
                   href="/messages"
-                  className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  className="p-2 text-white hover:text-ubc-gold transition-colors"
                 >
                   <MessageCircle className="h-5 w-5" />
                 </Link>
-                <div className="flex items-center space-x-2">
-                  <div className="p-2 bg-gray-100 rounded-full">
-                    <User className="h-5 w-5 text-gray-600" />
+                <Link
+                  href="/profile"
+                  className="flex items-center space-x-2 text-white hover:text-ubc-gold transition-colors"
+                >
+                  <div className="p-2 bg-white/20 rounded-full">
+                    <User className="h-5 w-5 text-white" />
                   </div>
-                  <span className="text-sm text-gray-600 hidden sm:block">
+                  <span className="text-sm hidden sm:block font-medium">
                     {session.user?.name}
                   </span>
-                </div>
+                </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  className="p-2 text-white hover:text-ubc-gold transition-colors"
                 >
                   <LogOut className="h-5 w-5" />
                 </button>
@@ -55,13 +58,13 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                  className="text-white hover:text-ubc-gold font-medium transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/signup"
-                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                  className="bg-white text-ubc-blue px-4 py-2 rounded-lg hover:bg-ubc-grayLight transition-colors font-medium shadow-sm"
                 >
                   Sign Up
                 </Link>

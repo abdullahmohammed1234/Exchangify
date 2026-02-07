@@ -36,7 +36,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <Link href={`/listings/${listing._id}`}>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all hover:border-ubc-blue/30">
         <div className="relative h-48 bg-gray-100">
           <img
             src={listing.imageUrl}
@@ -54,8 +54,8 @@ export default function ListingCard({ listing }: ListingCardProps) {
         </div>
         <div className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Tag className="h-3 w-3 text-gray-400" />
-            <span className="text-xs text-gray-500 uppercase tracking-wide">{listing.category}</span>
+            <Tag className="h-3 w-3 text-ubc-blue" />
+            <span className="text-xs text-ubc-blue font-medium uppercase tracking-wide">{listing.category}</span>
           </div>
           <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{listing.title}</h3>
           <div className="flex items-center gap-4 text-sm text-gray-500">
