@@ -175,3 +175,22 @@ export async function GET() {
     return NextResponse.json({ error: 'Seed failed' }, { status: 500 });
   }
 }
+
+export async function DELETE() {
+  try {
+    await connectDB();
+
+    // Clear all demo data
+    const usersDeleted = await User.deleteMany({});
+    const listingsDeleted = await Listing.deleteMany({});
+
+    return NextResponse.json({
+      message: 'Demo data cleared successfully!',
+      usersDeleted: usersDeleted.deletedCount,
+      listingsDeleted: listingsDeleted.deletedCount,
+    });
+  } catch (error) {
+    console.error('Clear demo data error:', error);
+    return NextResponse.json({ error: 'Failed to clear demo data' }, { status: 500 });
+  }
+}
