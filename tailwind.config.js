@@ -22,8 +22,18 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        ubc: {
+          blue: '#002145',
+          blueLight: '#0055A4',
+          blueHover: '#003366',
+          red: '#E31837',
+          redHover: '#C11228',
+          gold: '#FDB813',
+          gray: '#6D7B85',
+          grayLight: '#F4F4F4',
+        },
         primary: {
-          DEFAULT: "#E31837", // UBC Red
+          DEFAULT: "#E31837", // UBC Thunderbird Red
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
