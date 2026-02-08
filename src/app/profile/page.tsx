@@ -283,9 +283,10 @@ export default function ProfilePage() {
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {listings.map((item) => (
-                        <div
+                        <Link
+                          href={`/listings/${item.id}`}
                           key={item.id}
-                          className="bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow"
+                          className="bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow block"
                         >
                           <div className="flex items-center gap-4">
                             <div className="w-16 h-16 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0">
@@ -304,12 +305,12 @@ export default function ProfilePage() {
                             <div className="flex-1 min-w-0">
                               <h3 className="font-medium text-gray-900 truncate">{item.title}</h3>
                               <p className="text-lg font-bold text-primary">
-                                {item.isFree ? 'Free' : item.price ? `$${item.price}` : 'N/A'}
+                                {item.isFree ? 'Free' : item.price ? `${item.price}` : 'N/A'}
                               </p>
                               <p className="text-sm text-gray-500">{item.category}</p>
                             </div>
                           </div>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   )}

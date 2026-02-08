@@ -38,6 +38,10 @@ export async function GET(req: NextRequest) {
 
     const query: any = {};
 
+    // Only show non-expired listings by default
+    // Show listings where isExpired is false OR undefined (for backward compatibility)
+    query.$or = [{ isExpired: false }, { isExpired: { $exists: false } }];
+
     if (category && category !== 'all') {
       query.category = category;
     }
@@ -148,6 +152,7 @@ export async function POST(req: NextRequest) {
       isFree: rawData.isFree || false,
       isTrade: rawData.isTrade || false,
       isMoveOutBundle: rawData.isMoveOutBundle || false,
+      expiryDate: rawData.expiryDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days
     };
 
     // Validate required fields
@@ -191,6 +196,7 @@ export async function POST(req: NextRequest) {
       location: data.location,
       condition: data.condition,
       availableDate: new Date(data.availableDate),
+      expiryDate: new Date(data.expiryDate),
       imageUrl: data.imageUrl,
       imageUrls: data.imageUrls,
       userId: session.user.id,

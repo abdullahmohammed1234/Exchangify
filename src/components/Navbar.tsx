@@ -13,7 +13,8 @@ import {
   Bars3Icon,
   XMarkIcon,
   HeartIcon,
-  BellIcon
+  BellIcon,
+  CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
 
 export default function Navbar() {
@@ -90,6 +91,13 @@ export default function Navbar() {
                     title="Price Alerts"
                   >
                     <BellIcon className="h-6 w-6" />
+                  </Link>
+                  <Link
+                    href="/offers"
+                    className="p-2.5 text-gray-600 hover:text-ubc-blue hover:bg-ubc-blue/5 rounded-xl transition-colors"
+                    title="Offers"
+                  >
+                    <CurrencyDollarIcon className="h-6 w-6" />
                   </Link>
                   <Link
                     href="/messages"
@@ -219,6 +227,14 @@ export default function Navbar() {
                 >
                   <ChatBubbleLeftRightIcon className="h-6 w-6" />
                   <span className="font-medium">Messages</span>
+                </Link>
+                <Link
+                  href="/offers"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-ubc-blue hover:bg-ubc-blue/5 rounded-xl transition-colors"
+                >
+                  <CurrencyDollarIcon className="h-6 w-6" />
+                  <span className="font-medium">Offers</span>
                 </Link>
                 <Link
                   href="/profile"

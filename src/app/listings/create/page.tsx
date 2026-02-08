@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { DollarSign, Tag, MapPin, Image as ImageIcon, Save, X, Upload } from 'lucide-react';
+import { DollarSign, Tag, MapPin, Image as ImageIcon, Save, X, Upload, Clock } from 'lucide-react';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 
@@ -18,6 +18,7 @@ interface FormData {
   category: string;
   location: string;
   availableDate: string;
+  expiryDate: string;
   isMoveOutBundle: boolean;
 }
 
@@ -30,6 +31,7 @@ const initialFormData: FormData = {
   category: 'Dorm',
   location: 'Gage',
   availableDate: '',
+  expiryDate: '',
   isMoveOutBundle: false,
 };
 
@@ -132,6 +134,7 @@ export default function CreateListingPage() {
           price: formData.isFree || formData.isTrade ? null : parseFloat(formData.price),
           imageUrl: imageUrls[0], // Primary image
           imageUrls: imageUrls, // All images
+          expiryDate: formData.expiryDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // Default 30 days
         }),
       });
 
@@ -372,18 +375,33 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              {/* Available Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Available Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.availableDate}
-                  onChange={(e) => setFormData({ ...formData, availableDate: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  required
-                />
+              {/* Available Date & Expiry Date */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Available Date
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.availableDate}
+                    onChange={(e) => setFormData({ ...formData, availableDate: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    Expiry Date
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.expiryDate}
+                    onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    required
+                  />
+                </div>
               </div>
             </div>
           </div>
