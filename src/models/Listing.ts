@@ -10,6 +10,8 @@ export interface IListing extends Document {
   location: string;
   condition: string;
   availableDate: Date;
+  expiryDate: Date;
+  isExpired: boolean;
   imageUrl: string;
   imageUrls: string[];
   userId: mongoose.Types.ObjectId;
@@ -55,6 +57,15 @@ const ListingSchema = new Schema<IListing>(
     availableDate: {
       type: Date,
       required: true,
+    },
+    expiryDate: {
+      type: Date,
+      required: true,
+    },
+    isExpired: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
     imageUrl: {
       type: String,

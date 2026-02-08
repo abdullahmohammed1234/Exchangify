@@ -8,7 +8,8 @@ import {
   CalendarIcon,
   TagIcon,
   CubeIcon,
-  HeartIcon
+  HeartIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { format } from 'date-fns';
@@ -25,6 +26,8 @@ interface ListingCardProps {
     category: string;
     location: string;
     availableDate: Date;
+    expiryDate?: Date;
+    isExpired?: boolean;
     imageUrl: string;
     isMoveOutBundle: boolean;
     userId?: { name: string };
@@ -58,6 +61,9 @@ export default function ListingCard({ listing, isFavorite = false, onToggleFavor
     e.preventDefault();
     e.stopPropagation();
     
+    // Wait for session to load
+    if (session === undefined) return;
+    
     if (!session) {
       window.location.href = '/login';
       return;
@@ -71,16 +77,32 @@ export default function ListingCard({ listing, isFavorite = false, onToggleFavor
 
     try {
       const method = newFavoriteState ? 'POST' : 'DELETE';
-      const res = await fetch(`/api/wishlist?listingId=${listing._id}`, { method });
+      const res = await fetch(`/api/wishlist?listingId=${listing._id}`, { 
+        method,
+        headers: { 'Content-Type': 'application/json' }
+      });
       
+      // Check if response is OK before parsing JSON
       if (!res.ok) {
+        // Try to get error message, but handle empty responses
+        let errorMessage = 'Failed to update wishlist';
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          // Response was not JSON or empty
+        }
+        console.error('Wishlist error:', errorMessage);
         setLocalFavorite(!newFavoriteState);
-      } else if (onToggleFavorite) {
-        onToggleFavorite(listing._id);
+      } else {
+        // Success - update state
+        if (onToggleFavorite) {
+          onToggleFavorite(listing._id);
+        }
       }
     } catch (error) {
-      setLocalFavorite(!newFavoriteState);
       console.error('Failed to toggle favorite:', error);
+      setLocalFavorite(!newFavoriteState);
     } finally {
       setIsToggling(false);
     }
@@ -109,9 +131,10 @@ export default function ListingCard({ listing, isFavorite = false, onToggleFavor
           
           {/* Favorite Button */}
           <button
+            type="button"
             onClick={handleFavoriteClick}
             disabled={isToggling}
-            className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 ${
+            className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 z-10 ${
               localFavorite 
                 ? 'bg-red-500 text-white shadow-md' 
                 : 'bg-white/90 backdrop-blur-sm text-gray-500 hover:text-red-500 shadow-sm'
@@ -127,7 +150,7 @@ export default function ListingCard({ listing, isFavorite = false, onToggleFavor
           
           {/* Move-Out Badge */}
           {listing.isMoveOutBundle && (
-            <div className={`absolute top-3 left-3 ${badgeColor} text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md`}>
+            <div className={`absolute top-3 left-3 ${badgeColor} text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md z-10`}>
               <span className="flex items-center gap-1">
                 <CubeIcon className="h-3 w-3" />
                 Bundle
@@ -136,15 +159,30 @@ export default function ListingCard({ listing, isFavorite = false, onToggleFavor
           )}
           
           {/* Category Badge */}
-          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-sm">
+          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-sm z-10">
             <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide flex items-center gap-1">
               <TagIcon className="h-3 w-3 text-ubc-blue" />
               {listing.category}
             </span>
           </div>
           
+          {/* Expiry Badge - only show if expiryDate exists */}
+          {listing.expiryDate && (
+            listing.isExpired ? (
+              <div className="absolute top-3 right-24 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1 z-10">
+                <ClockIcon className="h-3 w-3" />
+                Expired
+              </div>
+            ) : (
+              <div className="absolute top-3 right-24 bg-amber-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1 z-10">
+                <ClockIcon className="h-3 w-3" />
+                Expires {format(new Date(listing.expiryDate), 'MMM d')}
+              </div>
+            )
+          )}
+          
           {/* Price Badge */}
-          <div className={`${priceColor} text-sm font-bold px-4 py-2 rounded-xl shadow-md absolute bottom-3 right-3`}>
+          <div className={`${priceColor} text-sm font-bold px-4 py-2 rounded-xl shadow-md absolute bottom-3 right-3 z-10`}>
             {priceDisplay}
           </div>
         </div>

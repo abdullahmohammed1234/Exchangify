@@ -19,6 +19,13 @@ export async function GET(
       return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
     }
 
+    // Check and update expiry status
+    const now = new Date();
+    if (!listing.isExpired && now > listing.expiryDate) {
+      listing.isExpired = true;
+      await listing.save();
+    }
+
     return NextResponse.json({ listing });
   } catch (error) {
     console.error('Get listing error:', error);

@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { MapPin, Calendar, User, ArrowLeft, MessageCircle, Package, Leaf, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
-import { format } from 'date-fns';
+import { MapPin, Calendar, User, ArrowLeft, MessageCircle, Package, Leaf, CheckCircle, ChevronLeft, ChevronRight, Clock, AlertCircle } from 'lucide-react';
+import { format, formatDistanceToNow, isPast } from 'date-fns';
 import Navbar from '@/components/Navbar';
 import StarRating from '@/components/StarRating';
 import BadgeDisplay from '@/components/BadgeDisplay';
 import FavoriteButton from '@/components/FavoriteButton';
+import ZoomableImage from '@/components/ZoomableImage';
+import OfferForm from '@/components/OfferForm';
 
 interface Listing {
   _id: string;
@@ -20,6 +22,8 @@ interface Listing {
   category: string;
   location: string;
   availableDate: Date;
+  expiryDate: Date;
+  isExpired: boolean;
   imageUrl: string;
   imageUrls: string[];
   isMoveOutBundle: boolean;
@@ -122,6 +126,13 @@ export default function ListingDetailPage() {
     ? 'Trade' 
     : `$${listing.price}`;
 
+  const isListingExpired = listing.isExpired || (listing.expiryDate && isPast(new Date(listing.expiryDate)));
+  const expiryStatus = listing.expiryDate 
+    ? (isPast(new Date(listing.expiryDate)) 
+        ? 'Expired'
+        : `Expires ${formatDistanceToNow(new Date(listing.expiryDate), { addSuffix: true })}`)
+    : 'No expiry set';
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -141,30 +152,39 @@ export default function ListingDetailPage() {
           </button>
 
           <div className="flex flex-col md:flex-row gap-8 items-center">
-            {/* Image */}
+            {/* Image with Zoom */}
             <div className="relative w-full md:w-1/2">
               <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src={listing.imageUrls && listing.imageUrls.length > 0 ? listing.imageUrls[currentImageIndex] : listing.imageUrl}
-                  alt={listing.title}
-                  className="w-full h-full object-cover"
-                />
+                {listing.imageUrls && listing.imageUrls.length > 0 ? (
+                  <ZoomableImage
+                    src={listing.imageUrls[currentImageIndex]}
+                    alt={listing.title}
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <img
+                    src={listing.imageUrl}
+                    alt={listing.title}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+                
                 {/* Image navigation arrows */}
                 {listing.imageUrls && listing.imageUrls.length > 1 && (
                   <>
                     <button
                       onClick={() => setCurrentImageIndex(currentImageIndex === 0 ? listing.imageUrls!.length - 1 : currentImageIndex - 1)}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
                     <button
                       onClick={() => setCurrentImageIndex(currentImageIndex === listing.imageUrls!.length - 1 ? 0 : currentImageIndex + 1)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                       {listing.imageUrls!.map((_, index) => (
                         <button
                           key={index}
@@ -182,6 +202,18 @@ export default function ListingDetailPage() {
                 <div className="absolute top-4 left-4 bg-green-500 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
                   <Package className="h-5 w-5" />
                   <span className="font-semibold">Move-Out Bundle</span>
+                </div>
+              )}
+              
+              {/* Expiry Badge - only show if expiryDate exists */}
+              {listing.expiryDate && (
+                <div className={`absolute top-4 right-4 px-3 py-1 rounded-full flex items-center gap-1 text-sm font-medium ${
+                  isListingExpired 
+                    ? 'bg-red-500 text-white' 
+                    : 'bg-amber-500 text-white'
+                }`}>
+                  <Clock className="h-4 w-4" />
+                  {isListingExpired ? 'Expired' : expiryStatus}
                 </div>
               )}
             </div>
@@ -242,27 +274,41 @@ export default function ListingDetailPage() {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-4 mb-4">
-                <button
-                  onClick={handleMessageSeller}
-                  disabled={sendingMessage || (session?.user?.id === listing.userId._id)}
-                  className="inline-flex items-center gap-2 bg-white text-ubc-blue px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  {sendingMessage ? 'Sending...' : 'Message Seller'}
-                </button>
-                
-                {session?.user?.id !== listing.userId._id && (
-                  <FavoriteButton
-                    userId={listing.userId._id}
-                    initialIsFavorited={isFavorited}
-                    onToggle={setIsFavorited}
-                  />
+                {isListingExpired ? (
+                  <div className="w-full bg-red-500/80 text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-2">
+                    <AlertCircle className="h-5 w-5" />
+                    This listing has expired
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={handleMessageSeller}
+                      disabled={sendingMessage || (session?.user?.id === listing.userId._id)}
+                      className="inline-flex items-center gap-2 bg-white text-ubc-blue px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <MessageCircle className="h-5 w-5" />
+                      {sendingMessage ? 'Sending...' : 'Message Seller'}
+                    </button>
+                    
+                    {session?.user?.id !== listing.userId._id && (
+                      <FavoriteButton
+                        userId={listing.userId._id}
+                        initialIsFavorited={isFavorited}
+                        onToggle={setIsFavorited}
+                      />
+                    )}
+                  </>
                 )}
               </div>
 
-              {session?.user?.id === listing.userId._id && (
+              {session?.user?.id === listing.userId._id && !isListingExpired && (
                 <p className="text-white/70 text-sm">
                   This is your listing
+                </p>
+              )}
+              {isListingExpired && session?.user?.id === listing.userId._id && (
+                <p className="text-white/70 text-sm">
+                  This listing has expired. You can renew it by creating a new listing.
                 </p>
               )}
             </div>
@@ -277,16 +323,31 @@ export default function ListingDetailPage() {
         </div>
       </section>
 
-      {/* Description Section */}
+      {/* Description and Offer Section */}
       <section className="py-12 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gray-50 rounded-2xl p-8">
+          <div className="bg-gray-50 rounded-2xl p-8 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Description</h2>
             <p className="text-gray-600 leading-relaxed">{listing.description}</p>
           </div>
 
+          {/* Offer Form (for non-owners, non-expired listings) */}
+          {!isListingExpired && session?.user?.id !== listing.userId._id && (
+            <div className="mb-8">
+              <OfferForm
+                listingId={listing._id}
+                currentPrice={listing.price}
+                isFree={listing.isFree}
+                isTrade={listing.isTrade}
+                onSuccess={() => {
+                  // Optionally refresh listing or show notification
+                }}
+              />
+            </div>
+          )}
+
           {/* Trust Badges */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl">
               <div className="p-2 bg-green-100 rounded-full">
                 <CheckCircle className="h-5 w-5 text-green-600" />

@@ -67,7 +67,19 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    const { listingId } = await req.json();
+    // Check if request body is empty
+    const text = await req.text();
+    if (!text) {
+      return NextResponse.json({ error: 'Request body is empty' }, { status: 400 });
+    }
+
+    let listingId: string;
+    try {
+      const body = JSON.parse(text);
+      listingId = body.listingId;
+    } catch (e) {
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
+    }
 
     if (!listingId) {
       return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
@@ -106,7 +118,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ wishlist }, { status: 201 });
+    return NextResponse.json({ success: true, wishlist }, { status: 201 });
   } catch (error) {
     console.error('Add to wishlist error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -154,7 +166,7 @@ export async function DELETE(req: NextRequest) {
     );
     await wishlist.save();
 
-    return NextResponse.json({ wishlist });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Remove from wishlist error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
