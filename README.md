@@ -1,4 +1,4 @@
-# DormLoop - UBC Student Marketplace
+# Exchangify - UBC Student Marketplace
 
 A UBC-only marketplace where students can buy, sell, and trade dorm items and student essentials during move-in and move-out seasons.
 
@@ -21,7 +21,7 @@ A UBC-only marketplace where students can buy, sell, and trade dorm items and st
 ## 📁 Project Structure
 
 ```
-dormloop/
+Exchangify/
 ├── src/
 │   ├── app/
 │   │   ├── api/
@@ -74,10 +74,10 @@ npm install
 
 ### 2. Configure Environment Variables
 
-Copy `.env.example` to `.env` and fill in your values:
+Copy `.env` and fill in your values:
 
 ```bash
-cp .env.example .env
+cp .env
 ```
 
 Required environment variables:
